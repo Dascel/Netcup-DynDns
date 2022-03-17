@@ -30,7 +30,6 @@ public class Api : INetcupApi
     {
         var request = new ApiRequest("logout");
         request.AddApiSessionAuth(customerNumber, apiKey, apiSessionId, clientRequestId);
-        request.Parameters.Add("customernumber", customerNumber.ToString());
 
         return await HttpClientPostAsync<ResponseMessage<string>>(request.ToHttpContent());
     }
