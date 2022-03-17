@@ -28,7 +28,8 @@ public class Api : INetcupApi
         return await HttpClientPostAsync<ResponseMessage<SessionObject>>(request.ToHttpContent());
     }
 
-    public async Task<ResponseMessage<string>?> Logout(int customerNumber, string apiKey, string apiSessionId, string clientRequestId = "")
+    public async Task<ResponseMessage<string>?> Logout(int customerNumber, string apiKey, string apiSessionId,
+        string clientRequestId = "")
     {
         var request = new ApiRequest("logout");
         request.Parameters.Add("customernumber", customerNumber.ToString());
@@ -39,7 +40,8 @@ public class Api : INetcupApi
         return await HttpClientPostAsync<ResponseMessage<string>>(request.ToHttpContent());
     }
 
-    public async Task<ResponseMessage<DnsRecordSet>?> InfoDnsRecords(string domainName, int customerNumber, string apiKey, string apiSessionId,
+    public async Task<ResponseMessage<DnsRecordSet>?> InfoDnsRecords(string domainName, int customerNumber,
+        string apiKey, string apiSessionId,
         string clientRequestId = "")
     {
         var request = new ApiRequest("infoDnsRecords");
@@ -48,11 +50,12 @@ public class Api : INetcupApi
         request.Parameters.Add("apikey", apiKey);
         request.Parameters.Add("apisessionid", apiSessionId);
         request.Parameters.Add("clientrequestid", clientRequestId);
-        
+
         return await HttpClientPostAsync<ResponseMessage<DnsRecordSet>>(request.ToHttpContent());
     }
 
-    public async Task<ResponseMessage<DnsRecordSet>?> UpdateDnsRecords(string domainName, int customerNumber, string apiKey, string apiSessionId, DnsRecordSet dnsRecordSet, string clientRequestId)
+    public async Task<ResponseMessage<DnsRecordSet>?> UpdateDnsRecords(string domainName, int customerNumber,
+        string apiKey, string apiSessionId, DnsRecordSet dnsRecordSet, string clientRequestId = "")
     {
         var request = new ApiRequest("updateDnsRecords");
         request.Parameters.Add("domainname", domainName);

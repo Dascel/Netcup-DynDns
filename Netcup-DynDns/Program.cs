@@ -40,7 +40,7 @@ if (!currentPublicIp.Equals(dynDnsRecord.Destination))
             {
                 dynDnsRecord
             }
-        }, "");
+        });
     Console.WriteLine($"DynDns record updated to {currentPublicIp}");
 }
 else
