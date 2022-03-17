@@ -5,9 +5,9 @@ public class PublicIp
     private HttpClient _httpClient;
     private const string IpCheckUrl = "http://checkip.dyndns.org/";
 
-    public PublicIp()
+    public PublicIp(HttpClient httpClient)
     {
-        _httpClient = new HttpClient();
+        _httpClient = httpClient;
     }
 
     public async Task<string> GetPublicIp()

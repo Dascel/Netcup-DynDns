@@ -14,7 +14,8 @@ var domainName = configurationRoot["domainName"];
 var dynDnsSubDomainName = configurationRoot["dynDnsSubDomainName"];
 
 Console.WriteLine($"Starting ip check");
-var api = new Api(new HttpClient());
+var httpClient = new HttpClient();
+var api = new Api(httpClient);
 
 var loginResult = await api.Login(customerNumber, apiKey, apiPassword);
 if (loginResult.ResponseData == null)
@@ -25,7 +26,7 @@ if (loginResult.ResponseData == null)
 var recordsResult = await api.InfoDnsRecords(domainName, customerNumber, apiKey, loginResult.ResponseData.ApiSessionId);
 var dynDnsRecord = recordsResult.ResponseData.DnsRecords.FirstOrDefault(dr => dr.Hostname.Equals(dynDnsSubDomainName));
 
-var publicIpCheck = new PublicIp();
+var publicIpCheck = new PublicIp(httpClient);
 var currentPublicIp = await publicIpCheck.GetPublicIp();
 
 if (!currentPublicIp.Equals(dynDnsRecord.Destination))
