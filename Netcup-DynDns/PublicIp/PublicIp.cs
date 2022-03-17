@@ -2,12 +2,12 @@
 
 public class PublicIp
 {
-    private HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
     private const string IpCheckUrl = "http://checkip.dyndns.org/";
 
     public PublicIp(HttpClient httpClient)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
     public async Task<string> GetPublicIp()

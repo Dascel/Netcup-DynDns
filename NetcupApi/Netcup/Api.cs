@@ -16,54 +16,43 @@ public class Api : INetcupApi
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
-    public async Task<ResponseMessage<SessionObject>?> Login(int customerNumber, string apiKey, string apiPassword,
+    public async Task<ResponseMessage<SessionObject>?> LoginAsync(int customerNumber, string apiKey, string apiPassword,
         string clientRequestId = "")
     {
         var request = new ApiRequest("login");
-        request.Parameters.Add("customernumber", customerNumber.ToString());
-        request.Parameters.Add("apikey", apiKey);
-        request.Parameters.Add("apipassword", apiPassword);
-        request.Parameters.Add("clientrequestid", clientRequestId);
+        request.AddApiLoginParams(customerNumber, apiKey, apiPassword, clientRequestId);
 
         return await HttpClientPostAsync<ResponseMessage<SessionObject>>(request.ToHttpContent());
     }
 
-    public async Task<ResponseMessage<string>?> Logout(int customerNumber, string apiKey, string apiSessionId,
+    public async Task<ResponseMessage<string>?> LogoutAsync(int customerNumber, string apiKey, string apiSessionId,
         string clientRequestId = "")
     {
         var request = new ApiRequest("logout");
+        request.AddApiSessionAuth(customerNumber, apiKey, apiSessionId, clientRequestId);
         request.Parameters.Add("customernumber", customerNumber.ToString());
-        request.Parameters.Add("apikey", apiKey);
-        request.Parameters.Add("apisessionid", apiSessionId);
-        request.Parameters.Add("clientrequestid", clientRequestId);
 
         return await HttpClientPostAsync<ResponseMessage<string>>(request.ToHttpContent());
     }
 
-    public async Task<ResponseMessage<DnsRecordSet>?> InfoDnsRecords(string domainName, int customerNumber,
+    public async Task<ResponseMessage<DnsRecordSet>?> InfoDnsRecordsAsync(string domainName, int customerNumber,
         string apiKey, string apiSessionId,
         string clientRequestId = "")
     {
         var request = new ApiRequest("infoDnsRecords");
+        request.AddApiSessionAuth(customerNumber, apiKey, apiSessionId, clientRequestId);
         request.Parameters.Add("domainname", domainName);
-        request.Parameters.Add("customernumber", customerNumber.ToString());
-        request.Parameters.Add("apikey", apiKey);
-        request.Parameters.Add("apisessionid", apiSessionId);
-        request.Parameters.Add("clientrequestid", clientRequestId);
 
         return await HttpClientPostAsync<ResponseMessage<DnsRecordSet>>(request.ToHttpContent());
     }
 
-    public async Task<ResponseMessage<DnsRecordSet>?> UpdateDnsRecords(string domainName, int customerNumber,
+    public async Task<ResponseMessage<DnsRecordSet>?> UpdateDnsRecordsAsync(string domainName, int customerNumber,
         string apiKey, string apiSessionId, DnsRecordSet dnsRecordSet, string clientRequestId = "")
     {
         var request = new ApiRequest("updateDnsRecords");
+        request.AddApiSessionAuth(customerNumber, apiKey, apiSessionId, clientRequestId);
         request.Parameters.Add("domainname", domainName);
-        request.Parameters.Add("customernumber", customerNumber.ToString());
-        request.Parameters.Add("apikey", apiKey);
-        request.Parameters.Add("apisessionid", apiSessionId);
         request.Parameters.Add("dnsrecordset", dnsRecordSet);
-        request.Parameters.Add("clientrequestid", clientRequestId);
 
         return await HttpClientPostAsync<ResponseMessage<DnsRecordSet>>(request.ToHttpContent());
     }
