@@ -11,12 +11,12 @@ var apiKey = configurationRoot["apiKey"];
 var apiPassword = configurationRoot["apiPassword"];
 var customerNumber = Convert.ToInt32(configurationRoot["customerNumber"]);
 var domainName = configurationRoot["domainName"];
-var dynDnsSubDomainName = configurationRoot["dynDnsSubDomainName"];
+var dynDnsSubDomains = configurationRoot.GetSection("dynDnsSubDomains").Get<string[]>();
 
 if (string.IsNullOrEmpty(apiKey) ||
     string.IsNullOrEmpty(apiPassword) ||
     string.IsNullOrEmpty(domainName) ||
-    string.IsNullOrEmpty(dynDnsSubDomainName))
+    dynDnsSubDomains.Length == 0)
 {
     Console.WriteLine("Not all needed config values are set, aborting.");
     return;
@@ -32,30 +32,32 @@ if (loginResult.ResponseData == null)
     Console.WriteLine("Could not get session, aborting.");
     return;
 }
-var recordsResult = await api.InfoDnsRecordsAsync(domainName, customerNumber, apiKey, loginResult.ResponseData.ApiSessionId);
-var dynDnsRecord = recordsResult.ResponseData.DnsRecords.FirstOrDefault(dr => dr.Hostname.Equals(dynDnsSubDomainName));
+
+var recordsResult =
+    await api.InfoDnsRecordsAsync(domainName, customerNumber, apiKey, loginResult.ResponseData.ApiSessionId);
 
 var publicIpCheck = new PublicIp(httpClient);
 var currentPublicIp = await publicIpCheck.GetPublicIp();
 
-if (!currentPublicIp.Equals(dynDnsRecord.Destination))
+var editList = new List<DnsRecord>();
+foreach (var subDomain in dynDnsSubDomains)
 {
-    dynDnsRecord.Destination = currentPublicIp;
-    
+    var dynDnsRecord = recordsResult.ResponseData.DnsRecords.FirstOrDefault(dr => dr.Hostname.Equals(subDomain));
+    if (!currentPublicIp.Equals(dynDnsRecord.Destination))
+    {
+        dynDnsRecord.Destination = currentPublicIp;
+        editList.Add(dynDnsRecord);
+        Console.WriteLine($"DynDns record ({dynDnsRecord.Hostname}) updated to {currentPublicIp}");
+    }
+    else
+    {
+        Console.WriteLine($"DynDns record ({dynDnsRecord.Hostname}) not updated is already {currentPublicIp}");
+    }
+}
+
+if(editList.Any())
     await api.UpdateDnsRecordsAsync(domainName, customerNumber, apiKey, loginResult.ResponseData.ApiSessionId,
-        new DnsRecordSet()
-        {
-            DnsRecords = new List<DnsRecord>()
-            {
-                dynDnsRecord
-            }
-        });
-    Console.WriteLine($"DynDns record updated to {currentPublicIp}");
-}
-else
-{
-    Console.WriteLine($"DynDns record not updated is already {currentPublicIp}");
-}
+        new DnsRecordSet() {DnsRecords = editList});
 
 await api.LogoutAsync(customerNumber, apiKey, loginResult.ResponseData.ApiSessionId);
 Console.WriteLine("Check done.");

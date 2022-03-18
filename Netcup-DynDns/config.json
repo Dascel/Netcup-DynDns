@@ -3,5 +3,5 @@
   "apiPassword": "",
   "customerNumber": 0,
   "domainName": "",
-  "dynDnsSubDomainName": ""
+  "dynDnsSubDomains": [""]
 }
