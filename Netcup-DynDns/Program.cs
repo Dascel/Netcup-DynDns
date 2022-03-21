@@ -3,9 +3,25 @@ using Netcup_DynDns.PublicIp;
 using NetcupApi.Common;
 using NetcupApi.Netcup;
 
-var configurationRoot = new ConfigurationBuilder()
-    .AddJsonFile("config.json", true)
-    .Build();
+
+IConfigurationRoot configurationRoot = null;
+
+if (args.Length > 0)
+{
+    configurationRoot = new ConfigurationBuilder()
+        .AddJsonStream(GenerateStreamFromString(args[0]))
+        .Build();
+
+    Console.WriteLine("Using program arguments");
+}
+else
+{
+    configurationRoot = new ConfigurationBuilder()
+        .AddJsonFile("config.json", true)
+        .Build();
+    
+    Console.WriteLine("Using config.json arguments");
+}
 
 var apiKey = configurationRoot["apiKey"];
 var apiPassword = configurationRoot["apiPassword"];
@@ -61,3 +77,13 @@ if(editList.Any())
 
 await api.LogoutAsync(customerNumber, apiKey, loginResult.ResponseData.ApiSessionId);
 Console.WriteLine("Check done.");
+
+static Stream GenerateStreamFromString(string s)
+{
+    var stream = new MemoryStream();
+    var writer = new StreamWriter(stream);
+    writer.Write(s);
+    writer.Flush();
+    stream.Position = 0;
+    return stream;
+}
